@@ -26,7 +26,7 @@ def load_data():
 
 
 @st.cache(suppress_st_warning=True)
-def get_data(xl):
+def get_data(xl, dir_col):
     my_prog = st.progress(0)
     # Sample Shales data:
     # xl = None
@@ -38,25 +38,29 @@ def get_data(xl):
     shale.depth = shale.depth.astype(float) #//1
     for n,i in enumerate(sheets[1:]):
         d = xl.parse(i,na_values=0).dropna(axis=1,how="all",inplace=False).dropna(axis=0,how="all",inplace=False)
-        d = d.astype({"depth":str})
-        d[d.depth == '*if Per A, maybe 10 m shallower'] = np.nan
-        d.depth = d.depth.astype(float) #//1
+        d = d.astype({"depth":float})
+        # d[d.depth == '*if Per A, maybe 10 m shallower'] = np.nan
+        # d.depth = d.depth.astype(float) #//1
         # d.set_index(["well","depth"], inplace = True) #,"form","facies",pd.Index(range(len(d))), verify_integrity = True
         # print(i,":\n",d.head(5))
-        if i=="Tensile":
-            for j in shale.dir.unique():
-                dc = d.copy()
-                dc["dir"] = j
-                shale = shale.merge(dc, on=list(shale.columns[shale.columns.isin(dc.columns)]), how="outer", )
-                dc = None
+        # if i=="Tensile":
+        #     for j in shale.dir.unique():
+        #         dc = d.copy()
+        #         dc["dir"] = j
+        #         shale = shale.merge(dc, on=list(shale.columns[shale.columns.isin(dc.columns)]), how="outer", )
+        #         dc = None
         print(i)
         my_prog.progress(ceil(100/len(sheets)*(n+2)))
         shale = shale.merge(d, on=list(shale.columns[shale.columns.isin(d.columns)]), how="outer", )
-    grsh = shale.groupby(by=["well","depth","dir"], dropna=False, as_index=False).mean()
+    col_bys = ['depth','well']
+    if dir_col:
+        col_bys.append('dir')
+
+    grsh = shale.groupby(by=col_bys, dropna=False, as_index=False).mean()
     grdepthsh = grsh.copy()
     grdepthsh.depth = 0.5*(np.array(grdepthsh.depth-grdepthsh.depth//1)>=0.5)+grdepthsh.depth//1
-    grdepthsh = grdepthsh.groupby(by=["well","depth","dir"], dropna=False, as_index=False).mean()
-    from time import strftime
+
+    grdepthsh = grdepthsh.groupby(by=col_bys, dropna=False, as_index=False).mean()
     filename = F"output_shales {time.strftime('%d.%m.%Y %H.%M.%S')}.xlsx"
     with pd.ExcelWriter(filename) as writer:  
         shale.to_excel(writer, sheet_name='SH')
@@ -111,7 +115,9 @@ try:
             # 'Sheet:',
             # all_sheets,index=0)
             # cols = st.sidebar.slider('Columns:', 0, 25, 14)
-            df = get_data(file)
+            dir_col = st.checkbox("Consider direction", True)
+            
+            df = get_data(file, dir_col)
             # df = pd.read_excel(file, usecols=range(cols))
             
         # Columns
@@ -194,4 +200,7 @@ try:
             except:
                 st.warning("Please try using numerical data for regression!")
 except Exception as e:
-    st.warning(e)
+    print(e)
+finally:
+    file.close()
+    st.stop()
