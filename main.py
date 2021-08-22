@@ -176,7 +176,7 @@ try:
                 .mark_circle(size=60)
                 .encode(
                     x=X_AXIS,
-                    y=Y(Y_AXIS),
+                    y=Y_AXIS,
                     color="well",
                     tooltip=[i for i in data.columns]
                 ).interactive()
