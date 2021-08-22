@@ -3,3 +3,4 @@ altair
 pandas
 matplotlib
 numpy
+seaborn
