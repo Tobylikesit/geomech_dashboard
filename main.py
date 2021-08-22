@@ -1,3 +1,4 @@
+
 import streamlit as st
 import pandas as pd
 import altair as alt
@@ -10,7 +11,7 @@ import time
 from math import ceil
 st.set_page_config(
      page_title="Geomechanics Dashboard",
-     page_icon="✅",
+     page_icon="🟢",
      layout="wide",
      initial_sidebar_state="expanded",
  )
@@ -18,6 +19,9 @@ COL1, COL2 = st.columns(2)
 
 
 def load_data():
+    if st.sidebar.button('GitHub', help='See GitHub page of the project for the instructions.'):
+        st.sidebar.markdown('[https://github.com/toqrul2000/...]\
+            (https://github.com/toqrul2000/geomech_dashboard)',unsafe_allow_html=True)
     file = st.sidebar.file_uploader("Upload your file",type=["xls","xlsx","xlsm","xlsb","odf","ods","odt"])
     # if file!=None:st.balloons()
     return file
