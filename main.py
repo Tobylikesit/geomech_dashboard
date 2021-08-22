@@ -39,7 +39,8 @@ def get_data(xl, dir_col, res_d):
     shale[shale.depth == '*if Per A, maybe 10 m shallower'] = np.nan
 
     shale.depth = shale.depth.astype(float) #//1
-    if len(sheets>1):
+    
+    if len(sheets)>1:
         for n,i in enumerate(sheets[1:]):
             d = xl.parse(i,na_values=0).dropna(axis=1,how="all",inplace=False).dropna(axis=0,how="all",inplace=False)
             d = d.astype({"depth":float})
@@ -56,6 +57,7 @@ def get_data(xl, dir_col, res_d):
             print(i)
             my_prog.progress(ceil(100/len(sheets)*(n+2)))
             shale = shale.merge(d, on=list(shale.columns[shale.columns.isin(d.columns)]), how="outer", )
+    
     col_bys = ['depth','well']
     if dir_col:
         col_bys.append('dir')
@@ -73,6 +75,8 @@ def get_data(xl, dir_col, res_d):
         shale.to_excel(writer, sheet_name='SH')
         grsh.to_excel(writer, sheet_name='GR_SH')
         grdepthsh.to_excel(writer, sheet_name='GR_SH_DEPTH')
+        my_prog.progress(100)
+    
         my_prog = None
     return pd.DataFrame(grdepthsh)
     # Sample data for sands:
