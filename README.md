@@ -19,7 +19,9 @@
   - [Installation](#installation)
 - [Usage](#usage)
   - [Run App](#run-app)
-  - [Preview](#preview)
+  - [Excel file requirements](#Excel-file-requirements)
+- [Preview](#preview)
+  - [Screenshot](#Screenshot)
 
 <!-- EDIT: ABOUT THE PROJECT -->
 
@@ -57,14 +59,16 @@ cd /toqrul2000/geomech_dashboard
 
 #### 2. Install dependencies
 
-```pip install requirements.txt
+```sh
+pip install requirements.txt
 ```
 
 ## Usage
 
 ### Run App
 
-```streamlit run main.py
+```sh
+streamlit run main.py
 ```
 
 ### Excel file requirements
