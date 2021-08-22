@@ -64,6 +64,7 @@ pip install requirements.txt
 ```
 
 ## Usage
+Choose columns for correlation, analyse interactive graphs and see regression coefficients.
 
 ### Run App
 
@@ -72,12 +73,12 @@ streamlit run main.py
 ```
 
 ### Excel file requirements
-1. Excel should contain multiple datasheets.
+1. Excel file should contain multiple datasheets. (Due to the bug, will be fixed soon)
 2. Each sheet should contain 'depth' and 'well' columns.
-3. Order of sheets merging with complete file is the same as sheets order in original excel file.
-4. Since join and merge methods are used related columns in different sheets should have the same name.
+3. Order of sheets merging for combined/compiled data-table is the same as sheets order in original excel file.
+4. Since join and merge methods are used related columns in different sheets should have the same column name.
 5. Avoid having extra data(/charts) below or in the side of your table in excel file.
-6. Load_data method uses data window resampling with 1 unit scale (1234.5,1234.9 are combined into one 1234.0)
+6. Load_data method uses data window resampling with 1 unit scale. (eg. 1234.5,1234.9 are combined into one 1234.0)
 
 ### Preview
 
