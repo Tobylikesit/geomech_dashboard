@@ -193,3 +193,5 @@ try:
                 st.write('\n')
             except:
                 st.warning("Please try using numerical data for regression!")
+except:
+     st.warning("Something went wrong")
