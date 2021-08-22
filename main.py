@@ -9,13 +9,13 @@ import seaborn as sns
 import numpy as np
 import time
 from math import ceil
-
 st.set_page_config(
      page_title="Geomechanics Dashboard",
      page_icon="🟢",
      layout="wide",
      initial_sidebar_state="expanded",
  )
+COL1, COL2 = st.columns(2)
 
 
 def load_data():
@@ -26,7 +26,7 @@ def load_data():
 
 
 @st.cache(suppress_st_warning=True)
-def get_data(xl, dir_col):
+def get_data(xl, dir_col, res_d):
     my_prog = st.progress(0)
     # Sample Shales data:
     # xl = None
@@ -55,11 +55,14 @@ def get_data(xl, dir_col):
     col_bys = ['depth','well']
     if dir_col:
         col_bys.append('dir')
-
     grsh = shale.groupby(by=col_bys, dropna=False, as_index=False).mean()
     grdepthsh = grsh.copy()
-    grdepthsh.depth = 0.5*(np.array(grdepthsh.depth-grdepthsh.depth//1)>=0.5)+grdepthsh.depth//1
+    if res_d:
+        grdepthsh.depth = 0.5*(np.array(grdepthsh.depth-grdepthsh.depth//1)>=0.5)+grdepthsh.depth//1
+    else:
+        grdepthsh = grsh.copy()
 
+        
     grdepthsh = grdepthsh.groupby(by=col_bys, dropna=False, as_index=False).mean()
     filename = F"output_shales {time.strftime('%d.%m.%Y %H.%M.%S')}.xlsx"
     with pd.ExcelWriter(filename) as writer:  
@@ -71,7 +74,11 @@ def get_data(xl, dir_col):
     # Sample data for sands:
     
     
-def poly_reg(x, y, order = 2, Plot = True):
+def poly_reg(x, y, Plot = True):
+    left,right = st.columns([3,1])
+
+    order = right.slider('Regression order:', 0, 3, step = 1, value = 1)
+    
     # Deleting null values
     cond = x.isnull() | y.isnull()
     x,y = np.array(x[~cond]), np.array(y[~cond])
@@ -87,7 +94,9 @@ def poly_reg(x, y, order = 2, Plot = True):
         plt.plot(t, p(t), ':', c = 'r' , label = 'reg')
         plt.legend()
         st.set_option('deprecation.showPyplotGlobalUse', False)
-        st.pyplot(plt.show())
+        left.pyplot(plt.show())
+    right.write('Regression coeffs')
+    right.write(coeffs)
     return(coeffs)
 
 
@@ -95,6 +104,7 @@ def poly_reg(x, y, order = 2, Plot = True):
 
 try:
     with st.echo(code_location='below'):
+        
         # Data Reading
         file = load_data()
         
@@ -115,9 +125,14 @@ try:
             # 'Sheet:',
             # all_sheets,index=0)
             # cols = st.sidebar.slider('Columns:', 0, 25, 14)
-            dir_col = st.checkbox("Consider direction", True)
-            
-            df = get_data(file, dir_col)
+            dir_col = COL1.checkbox("Consider direction", True,\
+                help = "Consider direction values while grouping and merging the data")
+            res_d = COL2.checkbox("Resample depth by 0.5 unit window", True,\
+                help = "Depth resampling combines raws with different depth values if\
+                    the distance is less than 0.5 unit (eg. 1999.23,1999.5,1999.99 => 1999.0,1999.5,1999.5)")
+            filt = COL1.checkbox("Filter data", False, \
+                help = "Values less than given will be omitted for further analysis")
+            df = get_data(file, dir_col, res_d)
             # df = pd.read_excel(file, usecols=range(cols))
             
         # Columns
@@ -162,16 +177,31 @@ try:
                 st.sidebar.warning("Dublicate column found, please change axes. \
                         (If you have well or depth selected as one of the\
                          axes please change it to data column with integers or floats.)")
+            # Filter:
+            
+            if filt:
+                with st.expander('Filtering',filt):
+                    x_filt = st.number_input("X-threshold value",help="Values less than given will be omitted for further analysis",
+                                            value=0.0, step = data[X_AXIS].min())
+                    y_filt = st.number_input("Y-threshold value",help="Values less than given will be omitted for further analysis",
+                                            value=0.0, step = data[Y_AXIS].min())
+                try:
+                    data[data[X_AXIS]<x_filt] = np.nan
+                    data[data[Y_AXIS]<y_filt] = np.nan
+                except:
+                    st.write("filtering unsuccessful)")
+            else:
+                pass
             # Visualisation
             if st.checkbox("Show all columns"):
-                st.write(data)
+                st.dataframe(data)
             else:
                 if X_AXIS in ['depth','well',Y_AXIS] or Y_AXIS in ['depth','well']:
                     st.warning("Dublicate column found, please change axes. \
                         (If you have well or depth selected as one of the axes please change it to data column with integers or floats.)")
                     st.stop()
                 else:
-                    st.write(data[['depth','well',X_AXIS,Y_AXIS]])
+                    st.dataframe(data[['depth','well',X_AXIS,Y_AXIS]])
 
             # data = data.T.reset_index()
             # data = pd.melt(data, id_vars=["index"]).rename(
@@ -193,14 +223,13 @@ try:
             # Regression
             try:
                 with st.spinner('Please wait...'):
-                    time.sleep(2)
-                order = st.slider('Regression order:', 0, 3, 1)
-                st.write('Regression coeffs:',poly_reg(data[X_AXIS],data[Y_AXIS],order=order))
+                    time.sleep(1)
+                poly_reg(data[X_AXIS],data[Y_AXIS])
                 st.write('\n')
             except:
                 st.warning("Please try using numerical data for regression!")
 except Exception as e:
     print(e)
 finally:
-    file.close()
+    # file.close()
     st.stop()
