@@ -194,4 +194,4 @@ try:
             except:
                 st.warning("Please try using numerical data for regression!")
 except Exception as e:
-    print(e)
+    st.warning(e)
