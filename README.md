@@ -1,7 +1,71 @@
-# geomech_dashboard
-## Built with streamlit and pandas for my bp internship project analysis.
-[Demo Link](https://share.streamlit.io/toqrul2000/geomech_dashboard/main/main.py)
-![preview](https://github.com/toqrul2000/geomech_dashboard/blob/main/screencapture-share-streamlit-io-toqrul2000-geomech-dashboard-main-main-py-2021-08-22-04_40_08.png?raw=true)
+
+
+<p align="center">
+  <h3 align="center">README GEOMECH DASHBOARD</h3> <!-- EDIT -->
+  <p align="center">
+    Pandas and streamlit backed web application for my internship data analysis. <!-- EDIT -->
+  </p>
+</p>
+
+<!-- EDIT: TABLE OF CONTENTS -->
+
+## Table of Contents
+
+- [Table of Contents](#table-of-contents)
+- [About The Project](#about-the-project)
+  - [Built With](#built-with)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+- [Usage](#usage)
+  - [Run App](#run-app)
+  - [Preview](#preview)
+
+<!-- EDIT: ABOUT THE PROJECT -->
+
+## About The Project
+
+Core data analysis datasheets combined on depth and well values for further correlations between columns.<!-- EDIT -->
+
+### Built With
+
+<!-- EDIT -->
+- streamlit
+- pandas
+- numpy
+- altair
+- matplotlib
+
+## Getting Started
+
+<!-- EDIT -->
+To get a local copy up and running follow these simple steps.
+
+### Prerequisites
+
+<!-- EDIT -->
+Python3 installed on your local machine.
+
+### Installation
+
+#### 1. Clone the repo
+
+```sh
+git clone https://github.com/toqrul2000/geomech_dashboard
+cd /toqrul2000/geomech_dashboard
+```
+
+#### 2. Install dependencies
+
+```pip install requirements.txt
+```
+
+## Usage
+
+### Run App
+
+```streamlit run main.py
+```
 
 ### Excel file requirements
 1. Excel should contain multiple datasheets.
@@ -11,3 +75,10 @@
 5. Avoid having extra data(/charts) below or in the side of your table in excel file.
 6. Load_data method uses data window resampling with 1 unit scale (1234.5,1234.9 are combined into one 1234.0)
 
+### Preview
+
+You can check out a live preview at: [Demo Link](https://share.streamlit.io/toqrul2000/geomech_dashboard/main/main.py)
+
+### Screenshot
+
+![preview](https://github.com/toqrul2000/geomech_dashboard/blob/main/screencapture-share-streamlit-io-toqrul2000-geomech-dashboard-main-main-py-2021-08-22-04_40_08.png?raw=true)
