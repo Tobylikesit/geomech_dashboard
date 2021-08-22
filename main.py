@@ -39,22 +39,23 @@ def get_data(xl, dir_col, res_d):
     shale[shale.depth == '*if Per A, maybe 10 m shallower'] = np.nan
 
     shale.depth = shale.depth.astype(float) #//1
-    for n,i in enumerate(sheets[1:]):
-        d = xl.parse(i,na_values=0).dropna(axis=1,how="all",inplace=False).dropna(axis=0,how="all",inplace=False)
-        d = d.astype({"depth":float})
-        # d[d.depth == '*if Per A, maybe 10 m shallower'] = np.nan
-        # d.depth = d.depth.astype(float) #//1
-        # d.set_index(["well","depth"], inplace = True) #,"form","facies",pd.Index(range(len(d))), verify_integrity = True
-        # print(i,":\n",d.head(5))
-        # if i=="Tensile":
-        #     for j in shale.dir.unique():
-        #         dc = d.copy()
-        #         dc["dir"] = j
-        #         shale = shale.merge(dc, on=list(shale.columns[shale.columns.isin(dc.columns)]), how="outer", )
-        #         dc = None
-        print(i)
-        my_prog.progress(ceil(100/len(sheets)*(n+2)))
-        shale = shale.merge(d, on=list(shale.columns[shale.columns.isin(d.columns)]), how="outer", )
+    if len(sheets>1):
+        for n,i in enumerate(sheets[1:]):
+            d = xl.parse(i,na_values=0).dropna(axis=1,how="all",inplace=False).dropna(axis=0,how="all",inplace=False)
+            d = d.astype({"depth":float})
+            # d[d.depth == '*if Per A, maybe 10 m shallower'] = np.nan
+            # d.depth = d.depth.astype(float) #//1
+            # d.set_index(["well","depth"], inplace = True) #,"form","facies",pd.Index(range(len(d))), verify_integrity = True
+            # print(i,":\n",d.head(5))
+            # if i=="Tensile":
+            #     for j in shale.dir.unique():
+            #         dc = d.copy()
+            #         dc["dir"] = j
+            #         shale = shale.merge(dc, on=list(shale.columns[shale.columns.isin(dc.columns)]), how="outer", )
+            #         dc = None
+            print(i)
+            my_prog.progress(ceil(100/len(sheets)*(n+2)))
+            shale = shale.merge(d, on=list(shale.columns[shale.columns.isin(d.columns)]), how="outer", )
     col_bys = ['depth','well']
     if dir_col:
         col_bys.append('dir')
