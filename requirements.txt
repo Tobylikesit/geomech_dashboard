@@ -1,7 +1,6 @@
 pandas
 altair
 pandas
-matplotlib.pyplot
 matplotlib
 numpy
 time
