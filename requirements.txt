@@ -3,6 +3,4 @@ altair
 pandas
 matplotlib
 numpy
-time
-urllib.error
-math
+urllib
