@@ -1,6 +1,4 @@
-logging
 altair.vegalite.v4.schema.channels
-streamlit
 pandas
 altair
 pandas
