@@ -1,6 +1,6 @@
 # geomech_dashboard
 Built with streamlit and pandas for my bp internship project analysis.
-!()[https://github.com/toqrul2000/geomech_dashboard/blob/main/screencapture-share-streamlit-io-toqrul2000-geomech-dashboard-main-main-py-2021-08-22-04_40_08.png?raw=true]
+!(https://github.com/toqrul2000/geomech_dashboard/blob/main/screencapture-share-streamlit-io-toqrul2000-geomech-dashboard-main-main-py-2021-08-22-04_40_08.png?raw=true)
 
 Excel file requirements
 1. Excel should contain multiple datasheets.
