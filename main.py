@@ -1,5 +1,4 @@
-from logging import warning
-from altair.vegalite.v4.schema.channels import Y
+
 import streamlit as st
 import pandas as pd
 import altair as alt
@@ -9,7 +8,6 @@ from matplotlib import cm
 import seaborn as sns
 import numpy as np
 import time
-from urllib.error import URLError
 from math import ceil
 
 st.set_page_config(
@@ -195,13 +193,3 @@ try:
                 st.write('\n')
             except:
                 st.warning("Please try using numerical data for regression!")
-                
-except URLError as e:
-    st.error(
-        """
-        **This demo requires internet access.**
-
-        Connection error: %s
-        """
-        % e.reason
-    )
