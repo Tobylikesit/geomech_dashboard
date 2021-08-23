@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 import altair as alt
@@ -9,17 +8,20 @@ import seaborn as sns
 import numpy as np
 import time
 from math import ceil
+
+
 st.set_page_config(
      page_title="Geomechanics Dashboard",
      page_icon="❇",
-     layout="wide",
+     layout="centered",
      initial_sidebar_state="expanded",
  )
-COL1, COL2 = st.columns(2)
+name = st.empty()
+header = st.container()
 
 
 def load_data():
-    if st.sidebar.button('GitHub', help='See GitHub page of the project for the instructions.'):
+    if st.sidebar.button('Geomechanics Dashboard GitHub', help=' See GitHub page of the project for the instructions.'):
         st.sidebar.markdown('[https://github.com/toqrul2000/...]\
             (https://github.com/toqrul2000/geomech_dashboard)',unsafe_allow_html=True)
     file = st.sidebar.file_uploader("Upload your file",type=["xls","xlsx","xlsm","xlsb","odf","ods","odt"])
@@ -30,6 +32,17 @@ def load_data():
 
 @st.cache(suppress_st_warning=True)
 def get_data(xl, dir_col, res_d):
+    """Data preproccesing, includes sheets merger, data grouping,
+    file writer (if runs locally)
+
+    Args:
+        xl (UploadedFile): Raw Excel File
+        dir_col (bool): Use dir column for grouping
+        res_d (bool): Resample data by 0.5 window depth
+
+    Returns:
+        DataFrame: Compiled DataFrame
+    """    
     my_prog = st.progress(0)
     # Sample Shales data:
     # xl = None
@@ -99,7 +112,7 @@ def poly_reg(x, y, Plot = True):
         t = np.linspace(x.min(), x.max(), 100)
         plt.scatter(x, y, label = 'orig')
         # print(p(t))
-        plt.plot(t, p(t), ':', c = 'r' , label = 'reg')
+        plt.plot(t, p(t), ':', c = '#009B00' , label = 'reg')
         plt.legend()
         st.set_option('deprecation.showPyplotGlobalUse', False)
         left.pyplot(plt.show())
@@ -115,8 +128,6 @@ try:
         
         # Data Reading
         file = load_data()
-        
-        
         if file == None:
             # ds = st.sidebar.radio(
             # "Or choose dataset:",
@@ -133,13 +144,16 @@ try:
             # 'Sheet:',
             # all_sheets,index=0)
             # cols = st.sidebar.slider('Columns:', 0, 25, 14)
-            dir_col = COL1.checkbox("Consider direction", True,\
-                help = "Consider direction values while grouping and merging the data")
-            res_d = COL2.checkbox("Resample depth by 0.5 unit window", True,\
-                help = "Depth resampling combines raws with different depth values if\
-                    the distance is less than 0.5 unit (eg. 1999.23,1999.5,1999.99 => 1999.0,1999.5,1999.5)")
-            filt = COL1.checkbox("Filter data", False, \
+            with header.form(key='checkboxes'):
+                col1, col2 = st.columns(2)
+                dir_col = col1.checkbox("Consider direction", True,\
+                    help = "Consider direction values while grouping and merging the data")
+                res_d = col2.checkbox("Resample depth by 0.5 unit window", True,\
+                    help = "Depth resampling combines raws with different depth values if\
+                        the distance is less than 0.5 unit (eg. 1999.23,1999.5,1999.99 => 1999.0,1999.5,1999.5)")
+                filt = col1.checkbox("Filter data", False, \
                 help = "Values less than given will be omitted for further analysis")
+                col2.form_submit_button(label = 'Get Data')
             df = get_data(file, dir_col, res_d)
             # df = pd.read_excel(file, usecols=range(cols))
             
@@ -157,7 +171,6 @@ try:
             df.rename(columns = {well_col_name: 'well'}, inplace = True)
         
         # Well selector
-        
         wellnonan = [x for x in np.array(df.well.unique()) if x is not np.nan]
         wells = st.multiselect("Choose wells", wellnonan, wellnonan)
         if not wells:
@@ -165,51 +178,54 @@ try:
             st.stop()
         else:
             data = df[df.well.isin(wells)]
+            
             # AXES
-            
-            xaxvalues = [x for x in np.array(df.columns.unique()) if x not in ['well','depth']]
-            
-            X_AXIS = st.sidebar.selectbox(
-            'X-axis column:',
-            xaxvalues,index=9%len(xaxvalues))
-            
-            yaxvalues = [x for x in np.array(df.columns.unique()) if x not in ['well','depth',X_AXIS]]
-            
-            Y_AXIS = st.sidebar.selectbox(
-            'Y-axis column:',
-            yaxvalues,index=12%len(yaxvalues))
-            st.write("#",X_AXIS,'vs',Y_AXIS)
-            
+            with st.sidebar.form(key='axes_sidebar'):
+                xaxvalues = [x for x in np.array(df.columns.unique()) if x not in ['well','depth']]
                 
-            if X_AXIS in ['depth','well',Y_AXIS] or Y_AXIS in ['depth','well']:
-                st.sidebar.warning("Dublicate column found, please change axes. \
-                        (If you have well or depth selected as one of the\
-                         axes please change it to data column with integers or floats.)")
+                x_axis = st.selectbox(
+                'X-axis column:',
+                xaxvalues,index=9%len(xaxvalues))
+                
+                yaxvalues = [x for x in np.array(df.columns.unique()) if x not in ['well','depth',x_axis]]
+                
+                y_axis = st.selectbox(
+                'Y-axis column:',
+                yaxvalues,index=12%len(yaxvalues))
+                
+                    
+                if x_axis in ['depth','well',y_axis] or y_axis in ['depth','well']:
+                    st.warning("Dublicate column found, please change axes. \
+                            (If you have well or depth selected as one of the\
+                            axes please change it to data column with integers or floats.)")
+                st.form_submit_button()
+            
+            name.markdown(f"# {x_axis} vs {y_axis}")
             # Filter:
             
             if filt:
-                with st.expander('Filtering',filt):
+                with header.expander('Filtering',filt):
                     x_filt = st.number_input("X-threshold value",help="Values less than given will be omitted for further analysis",
-                                            value=0.0, step = data[X_AXIS].min())
+                                            value=0.0, step = data[x_axis].min())
                     y_filt = st.number_input("Y-threshold value",help="Values less than given will be omitted for further analysis",
-                                            value=0.0, step = data[Y_AXIS].min())
+                                            value=0.0, step = data[y_axis].min())
                 try:
-                    data[data[X_AXIS]<x_filt] = np.nan
-                    data[data[Y_AXIS]<y_filt] = np.nan
+                    data[data[x_axis]<x_filt] = np.nan
+                    data[data[y_axis]<y_filt] = np.nan
                 except:
-                    st.write("filtering unsuccessful)")
+                    st.warning("filtering unsuccessful)")
             else:
                 pass
             # Visualisation
             if st.checkbox("Show all columns"):
                 st.dataframe(data)
             else:
-                if X_AXIS in ['depth','well',Y_AXIS] or Y_AXIS in ['depth','well']:
+                if x_axis in ['depth','well',y_axis] or y_axis in ['depth','well']:
                     st.warning("Dublicate column found, please change axes. \
                         (If you have well or depth selected as one of the axes please change it to data column with integers or floats.)")
                     st.stop()
                 else:
-                    st.dataframe(data[['depth','well',X_AXIS,Y_AXIS]])
+                    st.dataframe(data[['depth','well',x_axis,y_axis]])
 
             # data = data.T.reset_index()
             # data = pd.melt(data, id_vars=["index"]).rename(
@@ -219,8 +235,8 @@ try:
                 alt.Chart(data)
                 .mark_circle(size=60)
                 .encode(
-                    x=X_AXIS,
-                    y=Y_AXIS,
+                    x=x_axis,
+                    y=y_axis,
                     color="well",
                     tooltip=[i for i in data.columns]
                 ).interactive()
@@ -232,7 +248,7 @@ try:
             try:
                 with st.spinner('Please wait...'):
                     time.sleep(1)
-                poly_reg(data[X_AXIS],data[Y_AXIS])
+                poly_reg(data[x_axis],data[y_axis])
                 st.write('\n')
             except:
                 st.warning("Please try using numerical data for regression!")
@@ -264,7 +280,7 @@ try:
                 l.markdown(tmp_download_link, unsafe_allow_html=True)
                 
             if r.button('Download X and Y data as CSV'):
-                tmp_download_link = download_link(data[['depth','well',X_AXIS,Y_AXIS]], 'YOUR_XY_DATA.csv', 'Click here to download your XvsY data!')
+                tmp_download_link = download_link(data[['depth','well',x_axis,y_axis]], 'YOUR_XY_DATA.csv', 'Click here to download your XvsY data!')
                 r.markdown(tmp_download_link, unsafe_allow_html=True)
 except Exception as e:
     print(e)
