@@ -73,12 +73,12 @@ streamlit run main.py
 ```
 
 ### Excel file requirements
-1. Excel file should contain multiple datasheets. (Due to the bug, will be fixed soon)
+1. Excel file might contain multiple datasheets.
 2. Each sheet should contain 'depth' and 'well' columns.
-3. Order of sheets merging for combined/compiled data-table is the same as sheets order in original excel file.
+3. Order of sheets during merging process for combined/compiled data-table is the same as sheets order in original excel file.
 4. Since join and merge methods are used related columns in different sheets should have the same column name.
-5. Avoid having extra data(/charts) below or in the side of your table in excel file.
-6. Load_data method uses data window resampling with 1 unit scale. (eg. 1234.5,1234.9 are combined into one 1234.0)
+5. Avoid having extra data(/charts) below or in the side of your tables in excel file.
+6. Load_data method uses data window resampling with 0.5 unit scale. (eg. 1234.5,1234.9 are combined into one 1234.5)
 
 ### Preview
 
