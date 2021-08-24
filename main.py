@@ -165,7 +165,7 @@ try:
                 dir_col = col1.checkbox("Consider direction", True,\
                     help = "Consider direction values while grouping and merging the data")
                 res_d = col2.checkbox("Resample depth by 0.5 unit window", True,\
-                    help = "Depth resampling combines raws with different depth values if\
+                    help = "Depth resampling combines rows with different depth values if\
                         the distance is less than 0.5 unit (eg. 1999.23,1999.5,1999.99 => 1999.0,1999.5,1999.5)")
                 filt = col1.checkbox("Filter data", False, \
                 help = "Values less than given will be omitted for further analysis")
