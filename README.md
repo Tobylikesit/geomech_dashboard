@@ -47,6 +47,7 @@ To get a local copy up and running follow these simple steps.
 
 <!-- EDIT -->
 Python3 installed on your local machine.
+See [Streamlit Docs](https://docs.streamlit.io/en/latest/installation.html).
 
 ### Installation
 
